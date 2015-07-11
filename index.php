@@ -51,12 +51,22 @@
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar" style="padding-top: 50px;">
             <ul class="nav nav-sidebar">
-                <li class="active"><a href="#">Convert Excel to CSV <span class="sr-only">(current)</span></a></li>
+                <li id='convert_to_excel'><a href="#">Convert Excel to CSV</a></li>
                 <li id='generate_report'><a href="#">Generate Analysis Report</a></li>
-                <li><a href="#">Verify Email With Domain</a></li>
-                <li><a href="#">Send Mail Using SendGrid</a></li>
+                <li id='verify_email_with_domain'><a href="#">Verify Email With Domain</a></li>
+                <li id='send_email_sendgrid'><a href="#">Send Mail Using SendGrid</a></li>
             </ul>
         </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main collapse" id='generate_csv'>
+            <div class="panel panel-default" style="width: 75%;">
+               <div class="panel-heading">Import Excel File To Generate CSV</div>
+               <div class="panel-body">
+                 <p>Coming Soon...</p>
+               </div>
+            </div>
+        </div>
+
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main collapse" id='report_generation_section'>
             <div class="panel panel-default" style="width: 75%;">
                <div class="panel-heading">Generate Free Analysis Report</div>
@@ -71,6 +81,24 @@
                  <div id="free_analysis"></div>
                </div>
             </div>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main collapse" id='email_validator'>
+           <div class="panel panel-default" style="width: 75%;">
+              <div class="panel-heading">Validate Valid Email Through SMTP</div>
+              <div class="panel-body">
+                <p>Coming Soon...</p>
+              </div>
+           </div>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main collapse" id='send_mail_through_sendgrid'>
+           <div class="panel panel-default" style="width: 75%;">
+              <div class="panel-heading">Send Mail Through SendGrid Mail Server</div>
+              <div class="panel-body">
+                <p>Coming Soon...</p>
+              </div>
+           </div>
         </div>
     </div>
 </div>
@@ -91,7 +119,34 @@
 
 <script>
 $('#generate_report').click(function(e){
+      $(this).addClass('active');
+      $('#convert_to_excel, #verify_email_with_domain, #send_email_sendgrid ').removeClass('active');
+      $('#generate_csv, #email_validator, #send_mail_through_sendgrid').hide();
       $('#report_generation_section').show();
+      e.preventDefault();
+});
+
+$('#convert_to_excel').click(function(e){
+      $(this).addClass('active');
+      $('#generate_report, #verify_email_with_domain, #send_email_sendgrid ').removeClass('active');
+      $('#report_generation_section, #email_validator, #send_mail_through_sendgrid').hide();
+      $('#generate_csv').show();
+      e.preventDefault();
+});
+
+$('#verify_email_with_domain').click(function(e){
+      $(this).addClass('active');
+      $('#convert_to_excel, #generate_report, #send_email_sendgrid ').removeClass('active');
+      $('#report_generation_section, #generate_csv, #send_mail_through_sendgrid').hide();
+      $('#email_validator').show();
+      e.preventDefault();
+});
+
+$('#send_email_sendgrid').click(function(e){
+      $(this).addClass('active');
+      $('#convert_to_excel, #generate_report, #verify_email_with_domain ').removeClass('active');
+       $('#report_generation_section, #generate_csv, #email_validator').hide();
+      $('#send_mail_through_sendgrid').show();
       e.preventDefault();
 });
 
