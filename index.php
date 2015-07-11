@@ -1,44 +1,101 @@
+
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<html lang="en">
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Bootstrap, a sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.">
-    <meta name="keywords" content="HTML, CSS, JS, JavaScript, framework, bootstrap, front-end, frontend, web development">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Aequor Automated Tools</title>
+
+    <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/dashboard.css" rel="stylesheet">
     <link href="css/home.css" rel="stylesheet">
     <link href="data:text/css;charset=utf-8," data-href="css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet">
-    <title>HTML Template Design</title>
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
-<body class="">
-    <div class="container">
-        <div style="clear: both; height: 10px;"></div>
-        <div class="panel panel-default">
-            <div class="panel-heading">Reputation Upgrade Free Analysis Report</div>
-            <div class="panel-body">
-                <div id=inputs class=clearfix>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" style="background-image: url('images/Free_Analysis_Header.png'); background-repeat: no-repeat;height: 100px;background-size: cover;border-bottom: 2px solid red;">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!--<img id="company_logo_header navbar-brand" src="images/Free_Analysis_Header.png" alt="logo" style="width: 100%;">-->
+            <!--<a class="navbar-brand" href="#">REPUTATION UPGRADE ADMIN</a>-->
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid" style="padding-top: 50px;">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar" style="padding-top: 50px;">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a href="#">Convert Excel to CSV <span class="sr-only">(current)</span></a></li>
+                <li id='generate_report'><a href="#">Generate Analysis Report</a></li>
+                <li><a href="#">Verify Email With Domain</a></li>
+                <li><a href="#">Send Mail Using SendGrid</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main collapse" id='report_generation_section'>
+            <div class="panel panel-default" style="width: 75%;">
+               <div class="panel-heading">Generate Free Analysis Report</div>
+               <div class="panel-body">
+                 <div id=inputs class=clearfix>
                     <input type=file id=files name=files[] multiple />
-                </div>
-                <div style="clear: both; height: 10px;"></div>
-                <output id=list class="collapse"></output>
-                <table id=contents style="width:100%; height:400px;" class="table table-bordered table-responsive collapse"></table>
-                <div style="clear: both; height: 10px;"></div>
-                <div id="editor"></div>
-                <div id="free_analysis"></div>
+                 </div>
+                 <div style="clear: both; height: 10px;"></div>
+                 <output id=list class="collapse"></output>
+                 <table id=contents style="width:100%; height:400px;" class="table table-bordered table-responsive collapse"></table>
+                 <div style="clear: both; height: 10px;"></div>
+                 <div id="free_analysis"></div>
+               </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
 <script src="js/jquery-1.11.3.min.js"></script>
-<script src="js/jquery-migrate-1.2.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="js/jquery-migrate-1.2.1.min.js"></script>
 <script src="js/jquery.csv-0.71.js"></script>
 <script src="js/jspdf.min.js"></script>
+<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+<script src="js/holder.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="js/ie10-viewport-bug-workaround.js"></script>
+
 
 <script>
+$('#generate_report').click(function(e){
+      $('#report_generation_section').show();
+      e.preventDefault();
+});
 
-    $(document).ready(function() {
+$(document).ready(function() {
         if(isAPIAvailable()) {
             $('#files').bind('change', handleFileSelect);
         }
@@ -66,7 +123,6 @@
             return false;
         }
     }
-
     function handleFileSelect(evt) {
         var files = evt.target.files; // FileList object
         var file = files[0];
@@ -81,8 +137,6 @@
         // post the results
         $('#list').append(output);
     }
-
-
     function printTable(file) {
         var reader = new FileReader();
         reader.readAsText(file);
@@ -112,7 +166,7 @@
             var headers = $('#contents tr:first').find('td');
             var rating_text;
             $(row_values).each(function(i, doc_info){
-                $('#free_analysis').append('<div class="panel panel-default">' +
+                $('#free_analysis').append('<div class="panel panel-default" style="margin-bottom: 10px;">' +
                 '<div class="panel-heading">'+ $(doc_info).children(':first-child').text() +' Report ' +
                 '<button class="btn btn-default" style="float: right;margin-top: -7px;" id="generate_doc_pdf_'+i+'">Generate Report in PDF</button></div>' +
                 '<div class="panel-body pdf_main_background collapse" style="background-image: url(Free_Analysis_Report_Background.jpg)" id="report_main_content_'+i+'">' +
