@@ -59,10 +59,28 @@
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main collapse" id='generate_csv'>
-            <div class="panel panel-default" style="width: 75%;">
+            <div class="panel panel-default">
                <div class="panel-heading">Import Excel File To Generate CSV</div>
                <div class="panel-body">
-                 <p>Coming Soon...</p>
+                 Output Format:
+                 <select name="format">
+                 <option value="csv" selected> CSV</option>
+                 <option value="json"> JSON</option>
+                 <option value="form"> FORMULAE</option>
+                 </select>
+                 <div style="clear:both; height:10px;"></div>
+                 <div id="drop">Drop an XLSX / XLSM / XLSB / ODS / XLS / XML file here to see sheet data</div>
+                 <div style="clear:both; height:10px;"></div>
+                 <p><input type="file" name="xlfile" id="xlf" /></p>
+                 <textarea id="b64data" style="resize:none;">... or paste a base64-encoding here</textarea>
+                 <div style="clear:both; height:10px;"></div>
+                 <input type="button" id="dotext" value="Click here to process the base64 text" onclick="b64it();"/><br />
+                 Advanced Demo Options: <br />
+                 Use Web Workers: (when available) <input type="checkbox" name="useworker" checked><br />
+                 Use Transferrables: (when available) <input type="checkbox" name="xferable" checked><br />
+                 Use readAsBinaryString: (when available) <input type="checkbox" name="userabs" checked><br />
+                 <pre id="out" class="collapse"></pre>
+                 <br />
                </div>
             </div>
         </div>
@@ -115,6 +133,13 @@
 <script src="js/holder.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="js/ie10-viewport-bug-workaround.js"></script>
+
+
+<script src="js/shim.js"></script>
+<script src="js/jszip.js"></script>
+<script src="js/xlsx.js"></script>
+<!-- uncomment the next line here and in xlsxworker.js for ODS support -->
+<script src="js/dist/ods.js"></script>
 
 
 <script>
@@ -208,21 +233,12 @@ $(document).ready(function() {
             }
             $('#contents').html(html);
             $('#free_analysis').show();
-
-            var abc = $('#contents tr:not(:eq(0),:eq(1))');
-            $(abc).each(function(index, doc_name){
-                $('#doctors_list').show().append($('<option>', {
-                    value: index,
-                    text: $(doc_name).children(':first-child').text()
-                }));
-            });
-
-            var row_values = $('#contents tr:not(:eq(0),:eq(1))');
-            var headers = $('#contents tr:first').find('td');
+            var row_values = $('#contents tr:not(:eq(0),:eq(1), :eq(2))');
+            var headers = $('#contents tr:eq(1)').find('td');
             var rating_text;
             $(row_values).each(function(i, doc_info){
                 $('#free_analysis').append('<div class="panel panel-default" style="margin-bottom: 10px;">' +
-                '<div class="panel-heading">'+ $(doc_info).children(':first-child').text() +' Report ' +
+                '<div class="panel-heading">'+ $(doc_info).children(':first-child').text() +'Report'+
                 '<button class="btn btn-default" style="float: right;margin-top: -7px;" id="generate_doc_pdf_'+i+'">Generate Report in PDF</button></div>' +
                 '<div class="panel-body pdf_main_background collapse" style="background-image: url(Free_Analysis_Report_Background.jpg)" id="report_main_content_'+i+'">' +
                 '<div class="pdf_background" style="background-color: rgba(255, 255, 255, 0.7);top: 0;left: 0;width: 100%;height: 100%;display: table;">' +
@@ -242,7 +258,11 @@ $(document).ready(function() {
                     var dynamic_image_src;
                     var fixed_text;
                     if($(header).text() != ''){
-                        dynamic_image_src = $(this).text().replace('.com', '').replace(/\ /g, '_');
+                        if($(header).text() == "Google Search Engine Page Result "){
+                            dynamic_image_src = "Google_Search_Engine_Page_Result";
+                        }else{
+                            dynamic_image_src = $(this).text().replace('.com', '').replace(/ /g, "_");
+                        }
                         switch($(this).text()) {
                             case 'Infofree':
                                 fixed_text = 'See whether you have a business profile on '+$(this).text()+', your reviews and business credit rating';
@@ -290,9 +310,9 @@ $(document).ready(function() {
                                 fixed_text = 'See how you rate on '+$(this).text().replace('.com', '')+' on a scale of 5?';
                         }
                         rating_text = $(doc_info).children(':nth-child('+ (index+1) +')').text();
-                            $('#doctors_details_'+i+'').append('<div class="col-sm-4 col-md-3" style="width: 31%;float: left;position: relative;   min-height: 1px;   padding-right: 0;   padding-left: 15px;">' +
+                            $('#doctors_details_'+i+'').append('<div class="col-sm-4 col-md-3" style="width: 22%;float: left;position: relative;   min-height: 1px;   padding-right: 0;   padding-left: 15px;">' +
                             '<div class="thumbnail" style="display: block;padding: 4px;margin-bottom: 20px;line-height: 1.42857143;background-color: #fff;border: 1px solid #ddd; border-radius: 4px;-webkit-transition: border .2s ease-in-out;-o-transition: border .2s ease-in-out;transition: border .2s ease-in-out;height: 170px;min-height: 170px;">' +
-                            '<div class="panel-heading" style="background-color: #f36e45;height: 50px;color: white;padding: 10px 15px;border-bottom: 1px solid transparent;border-top-left-radius: 3px;border-top-right-radius: 3px;">' +
+                            '<div class="panel-heading" style="background-color: #f36e45;color: white;padding: 10px 15px;border-bottom: 1px solid transparent;border-top-left-radius: 3px;border-top-right-radius: 3px;">' +
                             '<div><img id="company_logo_source" src="images/'+ dynamic_image_src +'.png" alt="logo" style="margin-left: -9px;padding-right: 10px;width:15%;"/>' +
                             '<p style="margin-left: 12%;margin-top: -12%;">'+ $(this).text()+'</p>' +
                             '</div>' +
@@ -306,7 +326,7 @@ $(document).ready(function() {
                 });
                 $('#generate_doc_pdf_'+i+'').click(function () {
                     var divContents = $('#report_main_content_'+i+'').html();
-                    var printWindow = window.open('', '', 'height=1000,width=2500');
+                    var printWindow = window.open('', '', 'height=800,width=2500');
                     printWindow.document.write('</head><body style="font-size: 10px; background-image: url(Free_Analysis_Report_Background.jpg)" >');
                     printWindow.document.write(divContents);
                     printWindow.document.write('</body></html>');
@@ -319,6 +339,242 @@ $(document).ready(function() {
         };
         reader.onerror = function(){ alert('Unable to read ' + file.fileName); };
     }
+
+
+    var X = XLSX;
+    var XW = {
+        /* worker message */
+        msg: 'xlsx',
+        /* worker scripts */
+        rABS: 'js/xlsxworker2.js',
+        norABS: 'js/xlsxworker1.js',
+        noxfer: 'js/xlsxworker.js'
+    };
+
+    var rABS = typeof FileReader !== "undefined" && typeof FileReader.prototype !== "undefined" && typeof FileReader.prototype.readAsBinaryString !== "undefined";
+    if(!rABS) {
+        document.getElementsByName("userabs")[0].disabled = true;
+        document.getElementsByName("userabs")[0].checked = false;
+    }
+
+    var use_worker = typeof Worker !== 'undefined';
+    if(!use_worker) {
+        document.getElementsByName("useworker")[0].disabled = true;
+        document.getElementsByName("useworker")[0].checked = false;
+    }
+
+    var transferable = use_worker;
+    if(!transferable) {
+        document.getElementsByName("xferable")[0].disabled = true;
+        document.getElementsByName("xferable")[0].checked = false;
+    }
+
+    var wtf_mode = false;
+
+    function fixdata(data) {
+        var o = "", l = 0, w = 10240;
+        for(; l<data.byteLength/w; ++l) o+=String.fromCharCode.apply(null,new Uint8Array(data.slice(l*w,l*w+w)));
+        o+=String.fromCharCode.apply(null, new Uint8Array(data.slice(l*w)));
+        return o;
+    }
+
+    function ab2str(data) {
+        var o = "", l = 0, w = 10240;
+        for(; l<data.byteLength/w; ++l) o+=String.fromCharCode.apply(null,new Uint16Array(data.slice(l*w,l*w+w)));
+        o+=String.fromCharCode.apply(null, new Uint16Array(data.slice(l*w)));
+        return o;
+    }
+
+    function s2ab(s) {
+        var b = new ArrayBuffer(s.length*2), v = new Uint16Array(b);
+        for (var i=0; i != s.length; ++i) v[i] = s.charCodeAt(i);
+        return [v, b];
+    }
+
+    function xw_noxfer(data, cb) {
+        var worker = new Worker(XW.noxfer);
+        worker.onmessage = function(e) {
+            switch(e.data.t) {
+                case 'ready': break;
+                case 'e': console.error(e.data.d); break;
+                case XW.msg: cb(JSON.parse(e.data.d)); break;
+            }
+        };
+        var arr = rABS ? data : btoa(fixdata(data));
+        worker.postMessage({d:arr,b:rABS});
+    }
+
+    function xw_xfer(data, cb) {
+        var worker = new Worker(rABS ? XW.rABS : XW.norABS);
+        worker.onmessage = function(e) {
+            switch(e.data.t) {
+                case 'ready': break;
+                case 'e': console.error(e.data.d); break;
+                default: xx=ab2str(e.data).replace(/\n/g,"\\n").replace(/\r/g,"\\r"); console.log("done"); cb(JSON.parse(xx)); break;
+            }
+        };
+        if(rABS) {
+            var val = s2ab(data);
+            worker.postMessage(val[1], [val[1]]);
+        } else {
+            worker.postMessage(data, [data]);
+        }
+    }
+
+    function xw(data, cb) {
+        transferable = document.getElementsByName("xferable")[0].checked;
+        if(transferable) xw_xfer(data, cb);
+        else xw_noxfer(data, cb);
+    }
+
+    function get_radio_value( radioName ) {
+        var radios = document.getElementsByName( radioName );
+        for( var i = 0; i < radios.length; i++ ) {
+            if( radios[i].checked || radios.length === 1 ) {
+                return radios[i].value;
+            }
+        }
+    }
+
+    function to_json(workbook) {
+        var result = {};
+        workbook.SheetNames.forEach(function(sheetName) {
+            var roa = X.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+            if(roa.length > 0){
+                result[sheetName] = roa;
+            }
+        });
+        return result;
+    }
+
+    function to_csv(workbook) {
+        var result = [];
+        workbook.SheetNames.forEach(function(sheetName) {
+            var csv = X.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+            if(csv.length > 0){
+                result.push("SHEET: " + sheetName);
+                result.push("");
+                result.push(csv);
+            }
+        });
+        return result.join("\n");
+    }
+
+    function to_formulae(workbook) {
+        var result = [];
+        workbook.SheetNames.forEach(function(sheetName) {
+            var formulae = X.utils.get_formulae(workbook.Sheets[sheetName]);
+            if(formulae.length > 0){
+                result.push("SHEET: " + sheetName);
+                result.push("");
+                result.push(formulae.join("\n"));
+            }
+        });
+        return result.join("\n");
+    }
+
+    var tarea = document.getElementById('b64data');
+    function b64it() {
+        if(typeof console !== 'undefined') console.log("onload", new Date());
+        var wb = X.read(tarea.value, {type: 'base64',WTF:wtf_mode});
+        process_wb(wb);
+    }
+
+    function process_wb(wb) {
+        var output = "";
+        switch(get_radio_value("format")) {
+            case "json":
+                output = JSON.stringify(to_json(wb), 2, 2);
+                break;
+            case "form":
+                output = to_formulae(wb);
+                break;
+            default:
+                output = to_csv(wb);
+        }
+        $('#out').show();
+        if(out.innerText === undefined) out.textContent = output;
+        else out.innerText = output;
+        if(typeof console !== 'undefined') console.log("output", new Date());
+    }
+
+    var drop = document.getElementById('drop');
+    function handleDrop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        rABS = document.getElementsByName("userabs")[0].checked;
+        use_worker = document.getElementsByName("useworker")[0].checked;
+        var files = e.dataTransfer.files;
+        var f = files[0];
+        {
+            var reader = new FileReader();
+            var name = f.name;
+            reader.onload = function(e) {
+                if(typeof console !== 'undefined') console.log("onload", new Date(), rABS, use_worker);
+                var data = e.target.result;
+                if(use_worker) {
+                    xw(data, process_wb);
+                } else {
+                    var wb;
+                    if(rABS) {
+                        wb = X.read(data, {type: 'binary'});
+                    } else {
+                        var arr = fixdata(data);
+                        wb = X.read(btoa(arr), {type: 'base64'});
+                    }
+                    process_wb(wb);
+                }
+            };
+            if(rABS) reader.readAsBinaryString(f);
+            else reader.readAsArrayBuffer(f);
+        }
+    }
+
+    function handleDragover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    }
+
+    if(drop.addEventListener) {
+        drop.addEventListener('dragenter', handleDragover, false);
+        drop.addEventListener('dragover', handleDragover, false);
+        drop.addEventListener('drop', handleDrop, false);
+    }
+
+
+    var xlf = document.getElementById('xlf');
+    function handleFile(e) {
+        rABS = document.getElementsByName("userabs")[0].checked;
+        use_worker = document.getElementsByName("useworker")[0].checked;
+        var files = e.target.files;
+        var f = files[0];
+        {
+            var reader = new FileReader();
+            var name = f.name;
+            reader.onload = function(e) {
+                if(typeof console !== 'undefined') console.log("onload", new Date(), rABS, use_worker);
+                var data = e.target.result;
+                if(use_worker) {
+                    xw(data, process_wb);
+                } else {
+                    var wb;
+                    if(rABS) {
+                        wb = X.read(data, {type: 'binary'});
+                    } else {
+                        var arr = fixdata(data);
+                        wb = X.read(btoa(arr), {type: 'base64'});
+                    }
+                    process_wb(wb);
+                }
+            };
+            if(rABS) reader.readAsBinaryString(f);
+            else reader.readAsArrayBuffer(f);
+        }
+    }
+
+    if(xlf.addEventListener) xlf.addEventListener('change', handleFile, false);
+
 </script>
 </body>
 </html>
