@@ -32,7 +32,7 @@
 
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top" style="background-image: url('images/Free_Analysis_Header.png'); background-repeat: no-repeat;height: 100px;background-size: cover;border-bottom: 2px solid red;">
+<nav class="navbar navbar-inverse navbar-fixed-top" style="background-image: url('images/Free_Analysis_Header.png'); background-repeat: no-repeat;height: 145px;background-size: cover;border-bottom: 2px solid red;">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -47,9 +47,9 @@
     </div>
 </nav>
 
-<div class="container-fluid" style="padding-top: 50px;">
+<div class="container-fluid" style="padding-top: 80px;">
     <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar" style="padding-top: 50px;">
+        <div class="col-sm-3 col-md-2 sidebar" style="padding-top: 100px;">
             <ul class="nav nav-sidebar">
                 <li id='convert_to_excel'><a href="#">Convert Excel to CSV</a></li>
                 <li id='generate_report'><a href="#">Generate Analysis Report</a></li>
