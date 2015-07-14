@@ -35,55 +35,49 @@
               <div class="panel-heading">Validate Valid Email Through SMTP</div>
               <div class="panel-body">
               <form action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">
-              <input type="file" name="file">
+              <input type="file" name="csv">
               <input type="submit" name="btn_submit" value="Upload File" />
               <div style="clear:both; height:20px;"></div>
 
                <?php
-                error_reporting(0);
-                 $row = 1;
-                if (($handle = fopen($_FILES['file']['tmp_name'], "r+")) !== FALSE) {
-                  while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                  $num = count($data);
-                  $row++;
-                  $data;
-                   for ($c=0; $c < $num; $c++) {
-                     $data = $data[$c];
-                    // echo $data[$c] . "<br />\n";
-                    echo $data . "<br />\n";
-                   }
-                 }
-                 echo $row . "<br />\n";
-
-                 fclose($handle);
-                 }
-
-
-                  require_once('smtp_validateEmail.class.php');
-                  // the email to validate
-                  //$emails = array($row);
-                 // $emails = array('schambers@columbusconventions.com', 'htamarin@congressplazahotel.com', 'sandy@simsburyinn.com', 'durgesh@gmail.com', 'charles.canfield@beachboardwalk.com', 'durgesh.tripathi2@gmail.com');
-                  // an optional sender
-                  $sender = 'durgesh.tripathi@aequor.com';
-                  // instantiate the class
-                  $SMTP_Validator = new SMTP_validateEmail();
-                  // turn on debugging if you want to view the SMTP transaction
-                  $SMTP_Validator->debug = false;
-                  // do the validation
-                  $results = $SMTP_Validator->validate($emails, $sender);
-                  // view results
-                  echo "<table class='table table-bordered table-responsive'>\n\n";
-                  foreach($results as $email=>$result) {
-                  // send email?
-                  echo "<tr>";
-                    if ($result) {
-                      echo "<td style='padding:.4em;'>$email is valid</td>";
-                    } else {
-                      echo "<td style='padding:.4em;'>$email is not valid</td>";
-                    }
-                    echo "</tr>";
+                  error_reporting(0);
+                  $csv = array();
+                  // check there are no errors
+                  if($_FILES['csv']['error'] == 0){
+                      $name = $_FILES['csv']['name'];
+                      $ext = strtolower(end(explode('.', $_FILES['csv']['name'])));
+                      $type = $_FILES['csv']['type'];
+                      $tmpName = $_FILES['csv']['tmp_name'];
+                      // check the file is a csv
+                      if($ext === 'csv'){
+                       if(($handle = fopen($tmpName, 'r')) !== FALSE) {
+                         // necessary if a large csv file
+                         set_time_limit(0);
+                         $row = 0;
+                         while(($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                           require_once('smtp_validateEmail.class.php');
+                           $sender = 'durgesh.tripathi@aequor.com';
+                           $SMTP_Validator = new SMTP_validateEmail();
+                           $SMTP_Validator->debug = false;
+                           $results = $SMTP_Validator->validate($data, $sender);
+                           echo "<table class='table table-bordered table-responsive'>\n\n";
+                           foreach($results as $email=>$result) {
+                             echo "<tr>";
+                             if($result){
+                               echo "<td style='padding:.4em;'>$email is valid</td>";
+                             }else{
+                               echo "<td style='padding:.4em;'>$email is not valid</td>";
+                             }
+                             echo "</tr>";
+                           }
+                           echo "</table>";
+                           // inc the row
+                           $row++;
+                         }
+                         fclose($handle);
+                       }
+                      }
                   }
-                  echo "</table>";
                ?>
            </div>
         </div>
