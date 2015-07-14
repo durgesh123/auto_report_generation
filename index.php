@@ -105,7 +105,51 @@
            <div class="panel panel-default" style="width: 75%;">
               <div class="panel-heading">Validate Valid Email Through SMTP</div>
               <div class="panel-body">
-                <p>Coming Soon...</p>
+                <form action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+                  <input type="file" name="csv">
+                  <div style="clear:both; height:20px;"></div>
+                  <input type="submit" name="btn_submit" value="Upload File" id="validate_email_address" />
+                  <div style="clear:both; height:20px;"></div>
+                   <?php
+                      error_reporting(0);
+                      $csv = array();
+                      // check there are no errors
+                      if($_FILES['csv']['error'] == 0){
+                          $name = $_FILES['csv']['name'];
+                          $ext = strtolower(end(explode('.', $_FILES['csv']['name'])));
+                          $type = $_FILES['csv']['type'];
+                          $tmpName = $_FILES['csv']['tmp_name'];
+                          // check the file is a csv
+                          if($ext === 'csv'){
+                           if(($handle = fopen($tmpName, 'r')) !== FALSE) {
+                             // necessary if a large csv file
+                             set_time_limit(0);
+                             $row = 0;
+                             while(($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                               require_once('smtp_validateEmail.class.php');
+                               $sender = 'durgesh.tripathi@aequor.com';
+                               $SMTP_Validator = new SMTP_validateEmail();
+                               $SMTP_Validator->debug = false;
+                               $results = $SMTP_Validator->validate($data, $sender);
+                               echo "<table class='table table-bordered table-responsive'>\n\n";
+                               foreach($results as $email=>$result) {
+                                 echo "<tr>";
+                                 if($result){
+                                   echo "<td style='padding:.4em;'>$email is valid</td>";
+                                 }else{
+                                   echo "<td style='padding:.4em;'>$email is not valid</td>";
+                                 }
+                                 echo "</tr>";
+                               }
+                               echo "</table>";
+                               // inc the row
+                               $row++;
+                             }
+                             fclose($handle);
+                           }
+                          }
+                      }
+                   ?>
               </div>
            </div>
         </div>
