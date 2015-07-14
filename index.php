@@ -110,18 +110,6 @@
                   <div style="clear:both; height:20px;"></div>
                   <input type="submit" name="btn_submit" value="Upload File" id="validate_email_address" />
                   <div style="clear:both; height:20px;"></div>
-                  <table class="table table-bordered table-responsive">
-                  <tr>
-                      <th>Valid Email</th>
-                      <th>Invalid Email</th>
-                  </tr>
-                  <tr id='email_list'>
-                      <td></td>
-                      <td></td>
-                  </tr>
-                  </table>
-
-                  <div style="clear:both; height:20px;"></div>
 
                    <?php
                       error_reporting(0);
@@ -138,7 +126,9 @@
                              // necessary if a large csv file
                              set_time_limit(0);
                              $row = 0;
+                             echo "<a href='#' class='export' style='float:right;'>Export Emails</a>";
                              echo "<table class='table table-bordered table-responsive' id='smtp_validator'>\n\n";
+                             echo "<tr><th>Emails</th><th>Result</th></tr>";
                              while(($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
                                require_once('smtp_validateEmail.class.php');
                                $sender = 'durgesh.tripathi@aequor.com';
@@ -146,19 +136,21 @@
                                $SMTP_Validator->debug = false;
                                $results = $SMTP_Validator->validate($data, $sender);
                                foreach($results as $email=>$result) {
-                                 echo "<tr>";
                                  if($result){
-                                   echo "<td class='valid' style='padding:.4em;color:green;'>$email is valid</td>";
+                                   echo "<tr>";
+                                   echo "<td class='valid' style='padding:.4em;color:green;'>$email</td>";
+                                   echo "<td class='valid' style='padding:.4em;color:green;'>Valid Email</td>";
+                                   echo "</tr>";
                                  }else{
-                                   echo "<td class='invalid' style='padding:.4em;color:red;'>$email is not valid</td>";
+                                   echo "<tr>";
+                                   echo "<td class='invalid' style='padding:.4em;color:red;'>$email</td>";
+                                   echo "<td class='invalid' style='padding:.4em;color:red;'>Invalid Email</td>";
+                                   echo "</tr>";
                                  }
-                                  echo "</tr>";
                                }
-
                                // inc the row
                                $row++;
                              }
-
                              echo "</table>";
                              fclose($handle);
                            }
@@ -202,12 +194,79 @@
 
 
 <script>
-$('#validate_email_address').click(function(){
-     var valid_email = $('#smtp_validator tr').find('td.valid');
-     $(valid_email).each(function(){
-        $('#email_list').append('<td>'+$(this).text()+'</td>')
-     })
+function exportTableToCSV($table, filename) {
+    var $headers = $table.find('tr:has(th)')
+        ,$rows = $table.find('tr:has(td)')
+
+        // Temporary delimiter characters unlikely to be typed by keyboard
+        // This is to avoid accidentally splitting the actual contents
+        ,tmpColDelim = String.fromCharCode(11) // vertical tab character
+        ,tmpRowDelim = String.fromCharCode(0) // null character
+
+        // actual delimiter characters for CSV format
+        ,colDelim = '","'
+        ,rowDelim = '"\r\n"';
+
+        // Grab text from table into CSV formatted string
+        var csv = '"';
+        csv += formatRows($headers.map(grabRow));
+        csv += rowDelim;
+        csv += formatRows($rows.map(grabRow)) + '"';
+
+        // Data URI
+        var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+
+    $(this)
+        .attr({
+        'download': filename
+            ,'href': csvData
+            //,'target' : '_blank' //if you want it to open in a new window
+    });
+
+    //------------------------------------------------------------
+    // Helper Functions
+    //------------------------------------------------------------
+    // Format the output so it has the appropriate delimiters
+    function formatRows(rows){
+        return rows.get().join(tmpRowDelim)
+            .split(tmpRowDelim).join(rowDelim)
+            .split(tmpColDelim).join(colDelim);
+    }
+    // Grab and format a row from the table
+    function grabRow(i,row){
+
+        var $row = $(row);
+        //for some reason $cols = $row.find('td') || $row.find('th') won't work...
+        var $cols = $row.find('td');
+        if(!$cols.length) $cols = $row.find('th');
+
+        return $cols.map(grabCol)
+                    .get().join(tmpColDelim);
+    }
+    // Grab and format a column from the table
+    function grabCol(j,col){
+        var $col = $(col),
+            $text = $col.text();
+
+        return $text.replace('"', '""'); // escape double quotes
+
+    }
+}
+
+
+// This must be a hyperlink
+$(".export").click(function (event) {
+    // var outputFile = 'export'
+    var outputFile = window.prompt("What do you want to name your output file (Note: This won't have any effect on Safari)") || 'export';
+    outputFile = outputFile.replace('.csv','') + '.csv'
+
+    // CSV
+    exportTableToCSV.apply(this, [$('#smtp_validator'), outputFile]);
+
+    // IF CSV, don't do event.preventDefault() or return false
+    // We actually need this to be a typical hyperlink
 });
+
 
 $('#generate_report').click(function(e){
       $(this).addClass('active');
