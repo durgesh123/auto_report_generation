@@ -110,6 +110,19 @@
                   <div style="clear:both; height:20px;"></div>
                   <input type="submit" name="btn_submit" value="Upload File" id="validate_email_address" />
                   <div style="clear:both; height:20px;"></div>
+                  <table class="table table-bordered table-responsive">
+                  <tr>
+                      <th>Valid Email</th>
+                      <th>Invalid Email</th>
+                  </tr>
+                  <tr id='email_list'>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                  </table>
+
+                  <div style="clear:both; height:20px;"></div>
+
                    <?php
                       error_reporting(0);
                       $csv = array();
@@ -125,26 +138,28 @@
                              // necessary if a large csv file
                              set_time_limit(0);
                              $row = 0;
+                             echo "<table class='table table-bordered table-responsive' id='smtp_validator'>\n\n";
                              while(($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
                                require_once('smtp_validateEmail.class.php');
                                $sender = 'durgesh.tripathi@aequor.com';
                                $SMTP_Validator = new SMTP_validateEmail();
                                $SMTP_Validator->debug = false;
                                $results = $SMTP_Validator->validate($data, $sender);
-                               echo "<table class='table table-bordered table-responsive'>\n\n";
                                foreach($results as $email=>$result) {
                                  echo "<tr>";
                                  if($result){
-                                   echo "<td style='padding:.4em;'>$email is valid</td>";
+                                   echo "<td class='valid' style='padding:.4em;color:green;'>$email is valid</td>";
                                  }else{
-                                   echo "<td style='padding:.4em;'>$email is not valid</td>";
+                                   echo "<td class='invalid' style='padding:.4em;color:red;'>$email is not valid</td>";
                                  }
-                                 echo "</tr>";
+                                  echo "</tr>";
                                }
-                               echo "</table>";
+
                                // inc the row
                                $row++;
                              }
+
+                             echo "</table>";
                              fclose($handle);
                            }
                           }
@@ -187,6 +202,13 @@
 
 
 <script>
+$('#validate_email_address').click(function(){
+     var valid_email = $('#smtp_validator tr').find('td.valid');
+     $(valid_email).each(function(){
+        $('#email_list').append('<td>'+$(this).text()+'</td>')
+     })
+});
+
 $('#generate_report').click(function(e){
       $(this).addClass('active');
       $('#convert_to_excel, #verify_email_with_domain, #send_email_sendgrid ').removeClass('active');
@@ -275,7 +297,7 @@ $(document).ready(function() {
                 }
                 html += '</tr>\r\n';
             }
-            $('#contents').html(html);
+            $('#contents').show().html(html);
             $('#free_analysis').show();
             var row_values = $('#contents tr:not(:eq(0),:eq(1), :eq(2))');
             var headers = $('#contents tr:eq(1)').find('td');
@@ -350,21 +372,42 @@ $(document).ready(function() {
                             case 'Dmoz Listning':
                                 fixed_text = 'It assesses whether or not your website is listed on Dmoz open directory.';
                                 break;
+                            case 'Tripadvisor':
+                                fixed_text = 'See your rating on worlds largest travel site';
+                                break;
+                            case 'Expedia':
+                                fixed_text = 'See your rating and recommendations on Expedia';
+                                break;
+                            case 'Hotels.com':
+                                fixed_text = 'See your rating on hotels.com';
+                                break;
+                            case 'Travelocity':
+                                fixed_text = 'See your rating and recommendations on travelocity';
+                                break;
+                            case 'Orbitz':
+                                fixed_text = 'See your rating on Orbitz, a popular travel research, planning and booking website';
+                                break;
+                            case 'Trivago.com':
+                                fixed_text = 'See your exclusive rating by Trivago, travel meta-search engine focusing on hotels.';
+                                break;
+                            case 'Kayak':
+                                fixed_text = 'See your rating on one of the most travel search engine';
+                                break;
                             default:
                                 fixed_text = 'See how you rate on '+$(this).text().replace('.com', '')+' on a scale of 5?';
                         }
                         rating_text = $(doc_info).children(':nth-child('+ (index+1) +')').text();
-                            $('#doctors_details_'+i+'').append('<div class="col-sm-4 col-md-3" style="width: 22%;float: left;position: relative;   min-height: 1px;   padding-right: 0;   padding-left: 15px;">' +
-                            '<div class="thumbnail" style="display: block;padding: 4px;margin-bottom: 20px;line-height: 1.42857143;background-color: #fff;border: 1px solid #ddd; border-radius: 4px;-webkit-transition: border .2s ease-in-out;-o-transition: border .2s ease-in-out;transition: border .2s ease-in-out;height: 170px;min-height: 170px;">' +
+                            $('#doctors_details_'+i+'').append('<div class="col-sm-4 col-md-3" style="width: 30%;float: left;position: relative;   min-height: 1px;   padding-right: 0;   padding-left: 15px;">' +
+                            '<div class="thumbnail" style="display: block;padding: 4px;margin-bottom: 20px;line-height: 1.42857143;background-color: #FAFAFA;border: 1px solid #ddd; border-radius: 4px;-webkit-transition: border .2s ease-in-out;-o-transition: border .2s ease-in-out;transition: border .2s ease-in-out;height: 175px;min-height: 175px;">' +
                             '<div class="panel-heading" style="background-color: #f36e45;color: white;padding: 10px 15px;border-bottom: 1px solid transparent;border-top-left-radius: 3px;border-top-right-radius: 3px;">' +
                             '<div><img id="company_logo_source" src="images/'+ dynamic_image_src +'.png" alt="logo" style="margin-left: -9px;padding-right: 10px;width:15%;"/>' +
-                            '<p style="margin-left: 12%;margin-top: -12%;">'+ $(this).text()+'</p>' +
+                            '<p style="margin-left: 12%;margin-top: -12%; font-size:9px;">'+ $(this).text()+'</p>' +
                             '</div>' +
                             '</div>' +
                             '<div style="clear: both;"></div>'+
                             '<p style="color: #000000;text-align: center;">'+ fixed_text +'</p>' +
                             '<div style="clear: both;"></div>'+
-                            '<p style="color: #000000;text-align: center;word-wrap: break-word;" class="review_ratings'+dynamic_image_src+'"><b>' + rating_text+'</b></p>' +
+                            '<p style="color: #000000;text-align: center;word-wrap: break-word;" class="review_ratings'+dynamic_image_src+'"><b>' + rating_text+'</b><br></p>' +
                             '</div></div>');
                     }
                 });
