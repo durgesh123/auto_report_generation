@@ -297,7 +297,7 @@ $(document).ready(function() {
                 }
                 html += '</tr>\r\n';
             }
-            $('#contents').show().html(html);
+            $('#contents').html(html);
             $('#free_analysis').show();
             var row_values = $('#contents tr:not(:eq(0),:eq(1), :eq(2))');
             var headers = $('#contents tr:eq(1)').find('td');
