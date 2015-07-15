@@ -35,7 +35,7 @@ class SMTP_validateEmail {
  /**
   * Maximum Connection Time to wait for connection establishment per MTA 
   */
- var $max_conn_time = 30;
+ var $max_conn_time = 300;
  /**
   * Maximum time to read from socket before giving up
   */
