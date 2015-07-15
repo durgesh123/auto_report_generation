@@ -470,18 +470,18 @@ $(document).ready(function() {
                                 fixed_text = 'See how you rate on '+$(this).text().replace('.com', '')+' on a scale of 5?';
                         }
                         rating_text = $(doc_info).children(':nth-child('+ (index+1) +')').text();
-                            $('#doctors_details_'+i+'').append('<div class="col-sm-4 col-md-3" style="width: 22%;float: left;position: relative;   min-height: 1px;   padding-right: 0;   padding-left: 15px;">' +
-                            '<div class="thumbnail" style="display: block;padding: 4px;margin-bottom: 20px;line-height: 1.42857143;background-color: #FAFAFA;border: 1px solid #ddd; border-radius: 4px;-webkit-transition: border .2s ease-in-out;-o-transition: border .2s ease-in-out;transition: border .2s ease-in-out;height: 175px;min-height: 175px;">' +
-                            '<div class="panel-heading" style="background-color: #f36e45;color: white;padding: 10px 15px;border-bottom: 1px solid transparent;border-top-left-radius: 3px;border-top-right-radius: 3px;">' +
-                            '<div><img id="company_logo_source" src="images/'+ dynamic_image_src +'.png" alt="logo" style="margin-left: -9px;padding-right: 10px;width:15%;"/>' +
-                            '<p style="margin-left: 12%;margin-top: -12%; font-size:6.5px;">'+ $(this).text()+'</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div style="clear: both;"></div>'+
-                            '<p style="color: #000000;text-align: center;">'+ fixed_text +'</p>' +
-                            '<div style="clear: both;"></div>'+
-                            '<p style="color: #000000;text-align: center;word-wrap: break-word;" class="review_ratings'+dynamic_image_src+'"><b>' + rating_text+'</b><br></p>' +
-                            '</div></div>');
+                        $('#doctors_details_'+i+'').append('<div class="col-sm-4 col-md-3" style="width: 22%;float: left;position: relative;   min-height: 1px;   padding-right: 0;   padding-left: 15px;">' +
+                        '<div class="thumbnail" style="display: block;padding: 4px;margin-bottom: 20px;line-height: 1.42857143;background-color: #FAFAFA;border: 1px solid #ddd; border-radius: 4px;-webkit-transition: border .2s ease-in-out;-o-transition: border .2s ease-in-out;transition: border .2s ease-in-out;height: 176px;min-height: 176px;">' +
+                        '<div class="panel-heading" style="background-color: #f36e45;color: white;padding: 10px 15px;border-bottom: 1px solid transparent;border-top-left-radius: 3px;border-top-right-radius: 3px;">' +
+                        '<div><img id="company_logo_source" src="images/'+ dynamic_image_src +'.png" alt="logo" style="margin-left: -9px;padding-right: 10px;width:15%;"/>' +
+                        '<p style="margin-left: 12%;margin-top: -12%; font-size:6.5px;">'+ $(this).text()+'</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div style="clear: both;"></div>'+
+                        '<p style="color: #000000;text-align: center;font-size:10px;">'+ fixed_text +'</p>' +
+                        '<div style="clear: both;"></div>'+
+                        '<p style="color: #000000;text-align: center;word-wrap: break-word;font-size: 8px;" class="review_ratings'+dynamic_image_src+'"><b>' + rating_text.replace(/ *, */g, '<br>')+'</b><br></p>' +
+                        '</div></div>');
                     }
                 });
                 $('#generate_doc_pdf_'+i+'').click(function () {
