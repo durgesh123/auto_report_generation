@@ -106,10 +106,11 @@
               <div class="panel-heading">Validate Valid Email Through SMTP</div>
               <div class="panel-body">
                 <form action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">
-                  <input type="file" name="csv">
+                  <input type="file" name="csv" id="csv_input">
                   <div style="clear:both; height:20px;"></div>
                   <input type="submit" name="btn_submit" value="Upload File" id="validate_email_address" />
                   <div style="clear:both; height:20px;"></div>
+                  <img src="images/Please_Wait.gif" alt="Please wait" id="please_wait" class="collapse"/>
 
                    <?php
                       error_reporting(0);
@@ -194,6 +195,19 @@
 
 
 <script>
+$('#validate_email_address').click(function(){
+   var upload_csv = $('#csv_input').val();
+   if(upload_csv == ''){
+      alert('Please Select CSV to upload.');
+      return false;
+   }else{
+      $('#please_wait').show();
+      $('#email_validator').show();
+      $('#verify_email_with_domain').addClass('active')
+   }
+
+})
+
 function exportTableToCSV($table, filename) {
     var $headers = $table.find('tr:has(th)')
         ,$rows = $table.find('tr:has(td)')
